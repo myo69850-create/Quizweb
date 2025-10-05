@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quiz-5</title>
+<style>
+  body{font-family:Arial, sans-serif;margin:0;padding:0;background:#f9f9f9f9f9f9;}
+  .page{display:none;padding:5px;}
+  .active{display:block;}
+  #startPage{text-align:center;margin-top:100px;}
+  #startPage button{padding:10px 20px;font-size:18px;cursor:pointer;background:#0c6cc2;color:#fff;border:none;border-radius:5px;}
+
+
+  .resultBtn {
+  background:#0c6cc2;
+  color:#fff;
+  border:none;
+  padding:10px 15px;
+  border-radius:5px;
+  cursor:pointer;
+  font-size:16px;
+  margin-right:10px; /* space between buttons */
+}
+  .container{display:flex;margin-top:30px;
+    margin-left: -22px;
+  }
+  .content{flex:1;padding:20px;}
+
+  .question{margin-bottom:20px;border:1px solid #ccc;padding:10px 10px 10px 50px;border-radius:5px;position:relative;background:#fff;}
+  .question h3{margin-bottom:10px;}
+  .question label{display:block;margin-bottom:5px;}
+  .flag-btn{position:absolute;top:10px;left:10px;background:#fff;color:red;border:2px solid red;padding:5px 10px;cursor:pointer;border-radius:5px;}
+  .flagged-btn{background:red!important;color:#fff!important;}
+  .cancel-btn{margin-top:5px;background:#6c757d;color:#fff;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;}
+.reviewQuestion { margin-bottom:20px; padding:15px; background:white; border-radius:5px; box-shadow:0 0 5px rgba(0,0,0,0.1); }
+.reviewQuestion h3 { margin-bottom:10px; }
+.reviewQuestion ul { list-style:none; padding-left:0; margin-bottom:5px; }
+.reviewQuestion ul li { margin-bottom:3px; }
+.reviewQuestion p { margin:3px 0; }
+hr { border:none; border-top:1px solid #ccc; margin:10px 0; }
+#goHomeBtn { display:block; margin:20px auto; padding:10px 20px; font-size:16px; cursor:pointer; background:#0c6cc2; color:white; border:none; border-radius:5px; }
+  /* Sidebar buttons (sd-1) */
+  /* Floating semicircle open button */
+#sidebarOpenBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 0;
+  width: 35px;
+  height: 70px;
+  border-radius: 50px 0 0 50px; 
+  background: #c1c6ca;
+  color: black;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  z-index: 1000;
+}
+
+#quizSidebar {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 83.333%; /* 5/6 screen */
+  height: 100%;
+  background: #f7f7f7;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.3);
+  transition: right 0.3s ease;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebarHeader {
+  background: #f9fafc;
+  padding: 10px;
+  text-align: right;
+  margin: 10px;
+}
+#closeSidebarBtn {
+  background: none;
+  color: black;
+  border: 3px solid #0c6cc2;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#sidebarContainer {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaec;
+  border-radius: 10px;
+  margin-left: 15px;
+  margin-bottom: 30px;
+  padding: 5px;
+}
+#sidebarContainer h3 {
+  margin-bottom: 10px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+#sidebarNumbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+  gap: 5px;
+  
+  margin-left:10px;
+}
+
+.numBtn {
+  background: white;
+  border: 2px solid #7e7e7e;
+  border-radius: 5px;
+  aspect-ratio: 3/4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+.numBtn .num {
+  font-size: +13;
+  font-weight: bold;
+  margin-top: 0.01px;
+}
+.numBtn .status {
+  width: 100%;
+  height: 40%;
+  border-radius: 0 0 1px 1px;
+  background: transparent;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.numBtn.answered .status { background: gray; }
+.numBtn.flagged .status { background: red; }
+
+#finishAttemptBtn {
+  background: none;
+  border: none;
+  color: #0c6cc2;
+  font-weight: normal;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 10px;
+}
+
+/* Next Page under questions, aligned right */
+.next-wrapper {
+  text-align: right;
+  margin-top: 15px;
+}
+
+/* Bottom buttons wrapper */
+.bottom-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+/* --- Individual button styles --- */
+#nextPageBtn {
+  background: #0c6cc2;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#prevPageBtn {
+  background: #ccc; /* green example */
+  color: black;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#finishBtnBottom {
+  background: #0c6cc2; /* red example */
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+
+  #resultPage table {
+  width: 100%;            /* Full width for all screens */
+  max-width: 800px;       /* Optional: keep it readable on large screens */
+  margin: 20px auto;      /* Center table with some margin */
+  border-collapse: collapse;
+  table-layout: auto;     /* Adjust columns automatically */
+}
+
+#resultPage th, #resultPage td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+  word-break: break-word; /* Wrap text if too long */
+}
+
+#resultPage th {
+  background: #f2f2f2;
+  width: 30%;             /* Header column smaller */
+}
+
+#resultPage td {
+  width: 70%;             /* Value column larger */
+}
+
+@media screen and (max-width: 600px) {
+  #resultPage th, #resultPage td {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+  /* Review page styling (rs-1) */
+  #reviewContent div {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  #reviewContent .wrong-answer {
+    color: red;
+    font-weight: bold;
+  }
+
+  .hiddenPage{display:none;}
+/* Entire question container */
+/* Entire question container */
+.questionContainer {
+  display: flex;
+  flex-direction: column;      /* number square above question square */
+  gap: 30px;                    /* space between squares */
+  margin-bottom: 30px;
+  background: #fff;            /* page background white */
+  border-radius: 5px;
+  width: 100%;                 /* full width of parent container */
+  box-sizing: border-box;
+}
+
+/* Number square */
+.numberSquare {
+  width: 100%;
+  background: #F9F7FA;
+  border: 1px solid gray;
+  border-radius: 3px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Question label inside number square */
+.numberSquare .questionLabel {
+  font-size: 14px;
+}
+
+/* Question number: Question 1. (number next to text) */
+.numberSquare .questionNum {
+  font-size: 20px;
+  font-weight: bold;
+  display: inline;            /* number stays next to 'Question' */
+}
+
+/* Answer status text */
+.numberSquare .answerStatus {
+  font-size: 12px;
+}
+
+/* Flag link text */
+.numberSquare .flagLink {
+  font-size: 13px;
+  color: #0c6cc2;
+  text-decoration: ;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
+/* Question square */
+.questionSquare {
+  width: 100%;
+  background: #E7F0F7;
+  padding: 10px 15px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Clear my choice button aligned left */
+.questionSquare .cancelChoiceBtn {
+  font-size: 15px;
+  margin-left:20px;
+  text-decoration: ;
+  background: none;
+  border: none;
+  color: #0c6cc2;
+  cursor: pointer;
+  display: none;             /* only visible after answer selected */
+  align-self: flex-start;    /* left align */
+}
+
+/* Responsive for small screens */
+@media screen and (max-width: 600px) {
+  .numberSquare {
+    max-width: 100%;
+  }
+  .questionSquare {
+    padding: 30px 10px;
+  }
+}
+.flagIcon {
+  width: 22px;
+  height: 22px;
+}
+.flagTriangle {
+  fill: none;
+  stroke: gray;
+  stroke-width: 1.5;
+}
+.flagPole {
+  stroke: gray;   /* always gray */
+  stroke-width: 1.5;
+  fill: none;
+}
+.numberSquare.flagged .flagTriangle {
+  fill: red;      /* only the flag becomes red */
+  stroke: red;
+}
+.flagLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #0c6cc2;
+  background: none;
+  border: none;
+  padding: 0;
+}
+/* ---- Floating Timer ---- */
+#floatingTimer {
+  position: fixed;
+  top: 10px;
+  right: 75px;       /* space for hide button */
+  background: white;
+  border: 1px solid #D49D98;
+  padding: 10px 12px;
+  font-size: 16px;
+  font-weight: normal;
+  color: black;
+  border-radius: px; /* smooth corners */
+  z-index: 1001;
+}
+
+#hideTimerBtn {
+  position: fixed;
+  top: 10px;
+  right: 9px;
+  background: #ced2dc;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 10px; /* rounded corners */
+  cursor: pointer;
+  z-index: 1002;
+}
+
+#hideTimerBtn:hover {
+  background: #b8bfca;
+}
+
+/* ---- Page Header ---- */
+#pageHeader {
+  width: 100%;
+  position: relative;  /* not fixed */
+  top: 0;
+  z-index: 100;
+  background: #E7F0F7;
+  border: 1px solid #ccc;
+  border-radius: 0;   /* no round edges */
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+/* ---- Summary Page ---- */
+/* ---- Summary Page ---- */
+.summaryContainer {
+  width: 100%;
+  min-height: 100vh;
+  padding: 0px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summaryHeader {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  text-align: left;
+  align-self: flex-start;
+}
+
+.summaryTable {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 30px;
+}
+
+.summaryTable table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* Remove vertical lines */
+.summaryTable th,
+.summaryTable td {
+  border-top: 1px solid #ccc;   /* keep horizontal lines */
+  border-bottom: 1px solid #ccc;
+  border-left: none;            /* remove left/right borders */
+  border-right: none;
+  text-align: left;             /* left-align all cells */
+}
+
+
+.summaryTable thead th {
+  padding: 12px 16px;
+  background: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: left;             /* left-align headers */
+  padding: 20px;
+}
+
+/* Blank row height and color */
+.summaryTable tr.blank-row th {
+  height: 15px;         /* adjust space as needed */
+  background: #f8f6f9;  /* your desired color */
+  border: none;         /* no borders */
+}
+
+.summaryTable td {
+  padding: 20px 16px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.summaryTable tbody tr:nth-child(odd) td {
+  background: #ffffff;
+}
+.summaryTable tbody tr:nth-child(even) td {
+  background: #f8f6f9;
+}
+
+/* Question numbers as buttons */
+.summaryTable td.question button {
+  background: none;
+  border: none;
+  color: #0c6cc2;
+  text-decoration:;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0;
+  font-weight: 500;
+}
+.summaryTable td.question button:hover {
+  color: #0056b3;
+}
+
+/* ---- Action Buttons ---- */
+/* ---- Return to Attempt Button ---- */
+.returnBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #ced2dc;  /* gray */
+  color: black;
+  font-size: 15px;
+  cursor: pointer;
+  margin: 10px 5px 10px 0;
+}
+.returnBtn:hover {
+  background: #5a6268;
+}
+
+/* ---- Submit All and Finish Button ---- */
+.submitAllBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #0c6cc2;  /* blue */
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  margin: 10px 0 10px 5px;
+}
+.submitAllBtn:hover {
+  background: #0c6cc2;
+}
+
+/* ---- Timer in Summary ---- */
+#summaryPage .floatingTimer {
+  align-self: flex-end;
+  margin-top: 10px;
+}
+
+/* Overlay background (dim whole screen) */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  display: none;
+  justify-content: center;
+  align-items: flex-start;  /* stick to top instead of center */
+  padding-top: 40px;        /* distance from very top */
+  z-index: 3000;
+}
+
+/* Confirmation box */
+.confirmBox {
+  background: #fff;
+  width: 450px;
+  max-width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border:3px solid #116bba;
+}
+
+.confirmHeader {
+  font-size: 15px;
+  font-weight: bold;
+  padding: 5px;
+}
+
+.confirmBody {
+  margin: px 0;
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  padding: 5px;
+}
+
+.warningBox {
+  background: #feeedd;
+  color: #685842;
+  padding: 15px 12px;
+  margin-top: 5px;
+  border-radius: 6px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-block: 10px;
+}
+
+.cancelBtn {
+  background: #ccc;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submitBtn {
+  background: #0c6cc2;
+  color: #fff;
+  border: none;
+  padding: 15px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: #0c6cc2;
+}
+
+.deadline {
+    text-align: center;
+}
+
+/* ---- Summary Page Floating Timer ---- */
+#summaryFloatingTimer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;   /* right align */
+  margin: 10px 0;
+  width: 100%;
+}
+
+#summaryTimer {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-right: 10px;
+  border: 1px solid #D49D98;
+  padding: 10px;
+  font-weight: 500;
+}
+
+#hideSummaryTimerBtn {
+  padding: 10px;
+  border: none;
+  background: #ced2dc;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 10px; /* 
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+#hideSummaryTimerBtn:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- Start Page -->
+<div id="startPage" class="page active">
+  <h1>Quiz-5</h1>
+  <p>Total Marks: 100</p>
+  <p>Time Limit: 2 hours</p>
+  <button onclick="startQuiz()">Attempt quiz</button>
+</div>
+
+<!-- Quiz Page -->
+<div id="quizPage" class="page">
+
+  <div id="floatingTimer">Time left 2:00:00</div>
+  <button id="hideTimerBtn" onclick="toggleTimer('quiz')">Hide</button>
+
+
+  <div class="container">
+    <div class="content">
+      <!-- Header sentence for the current page -->
+      <div id="pageHeader"></div>
+
+      <!-- Quiz Questions -->
+      <form id="quizForm"></form>
+
+      <!-- Next Page right below questions -->
+      <div class="next-wrapper">
+        <button id="nextPageBtn" type="button" onclick="goNextPage()" style="display:none;">
+          Next Page
+        </button>
+      </div>
+
+      <!-- Bottom navigation (prev left, finish right) -->
+      <div class="bottom-buttons">
+        <button id="prevPageBtn" type="button" onclick="goPrevPage()" style="display:none;">
+          Previous Page
+        </button>
+        <button id="finishBtnBottom" type="button" onclick="showSummary()" style="display:none;">
+          Finish Attempt ...
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Sidebar inside quizPage -->
+  <!-- Sidebar Open Button (floating semicircle bottom-right) -->
+<!-- Floating semicircle open button -->
+<button id="sidebarOpenBtn" onclick="openSidebar()">&lt;</button>
+
+<!-- Sidebar -->
+<div id="quizSidebar">
+  <div id="sidebarHeader">
+    <span id="closeSidebarBtn" onclick="closeSidebar()">×</span>
+  </div>
+  <div id="sidebarContainer">
+    <h3>Quiz navigation</h3>
+    <div id="sidebarNumbers"></div>
+    <button id="finishAttemptBtn" onclick="showSummary()">Finish attempt...</button>
+  </div>
+</div>
+
+
+</div> <!-- ⬅️ closes quizPage only once -->
+
+<!-- Summary Page -->
+<div id="summaryPage" class="page">
+  <div class="summaryContainer">
+    <div class="summaryHeader">Summary of attempt</div>
+
+    <div class="summaryTable">
+  <table>
+    <thead>
+      <tr>
+        <th class="question" style="width:30%;">Question</th>
+        <th class="status">Status</th>
+      </tr>
+      <!-- Blank row -->
+      <tr class="blank-row">
+        <th colspan="2"></th>
+      </tr>
+    </thead>
+    <tbody id="summaryBody">
+      <!-- JS will inject rows here -->
+    </tbody>
+  </table>
+</div>
+
+    <!-- Return button -->
+    <button class="returnBtn" onclick="showPage('quizPage')">Return to attempt</button>
+
+    <!-- Timer (below return, right aligned) -->
+   <div id="summaryFloatingTimer" class="floatingTimer">
+  <span id="summaryTimer" class="timerText">Time left 2:00:00</span>
+  <button id="hideSummaryTimerBtn" onclick="toggleTimer('summary')">Hide</button>
+</div>
+
+    <!-- Deadline -->
+    <div class="deadline" id="summaryDeadline"></div>
+
+    <!-- Submit all button -->
+    <button class="submitAllBtn" id="submitAllBtn">Submit all and finish</button>
+  </div>
+
+ <!-- Confirmation Overlay -->
+<div id="confirmationContainer" class="overlay" style="display:none;">
+  <div class="confirmBox">
+    <div class="confirmHeader"><h3>Submit all your answers and finish?</h3></div>
+    <hr>
+    <div class="confirmBody">
+      <p>Once you submit your answers, you won't be able to change them.</p>
+      <div class="warningBox" id="unansweredCount">Questions without a response: 0</div>
+    </div>
+    <hr>
+    <div class="confirmActions">
+      <button onclick="closeConfirmation()" class="cancelBtn">Cancel</button>
+      <button onclick="confirmSubmit()" class="submitBtn">Submit all and finish</button>
+    </div>
+  </div>
+</div>
+</div>
+<!-- Result Page -->
+<div id="resultPage" class="page act">
+  <h1>Quiz Result</h1>
+
+  <!-- Buttons above the table -->
+  <div style="margin-bottom: 15px;">
+    <button type="button" class="resultBtn" onclick="goHome()">Re-attempt Quiz</button>
+    <button type="button" class="resultBtn" onclick="showReview()">Review Answers</button>
+  </div>
+
+  <table>
+    <tr><th>Started</th><td id="startTime"></td></tr>
+    <tr><th>Completed</th><td id="endTime"></td></tr>
+    <tr><th>Duration</th><td id="duration"></td></tr>
+    <tr><th>Grade</th><td id="grade"></td></tr>
+  </table>
+</div>
+
+<!-- Review Page -->
+<div id="reviewPage" class="page">
+  <h1>Quiz Review</h1>
+  <div id="reviewContainer"></div> <!-- THIS IS REQUIRED -->
+  <button id="goHomeBtn" onclick="goHome()">Go Home</button>
+</div>
+<script>
+// Section headers for each quiz page
+const pageHeaders = {
+  1: "Section I: Answer the following 1-mark questions.",
+  2: "Section II: Answer the following 2-mark questions.",
+};
+// --- Page headers ---
+// Add Page 1 Header
+// Add Page 1 Header  
+const page1Header = document.createElement('div');  
+page1Header.className = "pageHeader";  
+page1Header.textContent = "Section I: Answer the following 1-mark questions.";  
+reviewContainer.appendChild(page1Header);  
+
+// Add Page 2 Header  
+const page2Header = document.createElement('div');  
+page2Header.className = "pageHeader";  
+page2Header.textContent = "Section II: Answer the following 2-mark questions.";  
+reviewContainer.appendChild(page2Header);
+
+
+// --- Question banks ---
+const page1Bank = [
+  { q: "Which sentence correctly uses 'both ... and'?",
+    options: ["Both Ko Zaw or Soe Thu are good students.",
+              "Both Ko Zaw and Soe Thu are good students.",
+              "Ko Zaw is both and Soe Thu are good students.",
+              "Both Ko Zaw and Soe Thu is good students."],
+    correct: "B" }
+];
+
+const page2Bank = [
+{ q: "Which year did Elon Musk acquire Twitter?", options: ["2018", "2020", "2022", "2023"], correct: "C" },
+];
+
+// --- Quiz variables ---
+let quizQuestionsPage1 = [];
+let quizQuestionsPage2 = [];
+let quizQuestions = [];
+let currentPage = 1;
+let quizQuestionsPage1Original = [];
+let quizQuestionsPage2Original = [];
+
+// --- Build quiz questions with unique ids ---
+function buildQuiz() {
+  if(quizQuestionsPage1Original.length === 0) {
+    quizQuestionsPage1Original = page1Bank.map((q,i)=>{
+      const opts = shuffleArray(q.options);
+      const id = `q1-${i+1}`;
+      return {
+        ...q,
+        _opts: opts,
+        _correctLetter: String.fromCharCode(65 + opts.indexOf(q.options[["A","B","C","D"].indexOf(q.correct)])),
+        id,
+        page: 1,
+        answered: false,
+        flagged: false
+      };
+    });
+  }
+
+  if(quizQuestionsPage2Original.length === 0) {
+    quizQuestionsPage2Original = page2Bank.map((q,i)=>{
+      const opts = shuffleArray(q.options);
+      const id = `q2-${i+1}`;
+      return {
+        ...q,
+        _opts: opts,
+        _correctLetter: String.fromCharCode(65 + opts.indexOf(q.options[["A","B","C","D"].indexOf(q.correct)])),
+        id,
+        page: 2,
+        answered: false,
+        flagged: false
+      };
+    });
+  }
+
+  // Reset for a new attempt without changing numbering
+  quizQuestionsPage1 = quizQuestionsPage1Original.map(q => ({ ...q, answered: false, flagged: false, selected: null }));
+  quizQuestionsPage2 = quizQuestionsPage2Original.map(q => ({ ...q, answered: false, flagged: false, selected: null }));
+
+  quizQuestions = [...quizQuestionsPage1, ...quizQuestionsPage2];
+}
+
+
+// --- Shuffle helper ---
+function shuffleArray(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+
+// --- Render quiz questions ---
+function renderQuiz() {
+  const f = document.getElementById('quizForm');
+  f.innerHTML = '';
+
+  const pageQuestions = currentPage === 1 ? quizQuestionsPage1 : quizQuestionsPage2;
+
+  pageQuestions.forEach((q, pageIndex) => {
+    const globalIndex = quizQuestions.indexOf(q) + 1; // global numbering
+    const container = document.createElement('div');
+    container.className = 'questionContainer';
+    container.id = q.id;
+    container.dataset.page = q.page;
+    container.classList.toggle('hiddenPage', q.page !== currentPage);
+
+    // Number square (same as before)
+    const numSquare = document.createElement('div');
+    numSquare.className = 'numberSquare';
+    numSquare.innerHTML = `
+      <div class="questionLabel"><b>Question</b> <span class="questionNum">${globalIndex}</span></div>
+      <div class="answerStatus">${q.answered ? 'Answer' : 'Not yet answered'}</div>
+      <button type="button" class="flagLink">
+        <svg class="flagIcon" viewBox="0 0 24 24">
+          <line class="flagPole" x1="1" y1="2" x2="8" y2="22"/>
+          <polygon class="flagTriangle" points="2,2 16,6 5,10"/>
+        </svg>
+        Flag question
+      </button>
+    `;
+    const flagBtn = numSquare.querySelector('.flagLink');
+    flagBtn.onclick = () => {
+      q.flagged = !q.flagged;
+      numSquare.classList.toggle('flagged', q.flagged);
+      showSidebarNumbers();
+    };
+
+    // Page header
+    if (currentPage === 1) {
+      document.getElementById("pageHeader").textContent = "Section I Answer the following 1-mark questions.";
+    } else if (currentPage === 2) {
+      document.getElementById("pageHeader").textContent = "Section II: Answer the following 2-mark questions.";
+    }
+
+    // Question square
+    const qSquare = document.createElement('div');
+    qSquare.className = 'questionSquare';
+
+    if (currentPage === 1) {
+      // --- PAGE 1: radio buttons ---
+      qSquare.innerHTML = `
+        <h3>${q.q}</h3>
+        ${q._opts.map((o,j)=>`
+          <label>
+            <input type="radio" name="${q.id}" value="${String.fromCharCode(65+j)}" ${q.answered && q.selected === String.fromCharCode(65+j) ? 'checked' : ''}>
+            ${o}
+          </label>
+        `).join('')}
+        <button class="cancelChoiceBtn" type="button" ${q.answered ? '' : 'style="display:none"'}>Clear my choice</button>
+      `;
+
+      const cancelBtn = qSquare.querySelector('.cancelChoiceBtn');
+      cancelBtn.onclick = () => {
+        qSquare.querySelectorAll('input').forEach(i=>i.checked=false);
+        cancelBtn.style.display='none';
+        q.answered = false;
+        updateNumberSquareStatus(q.id, numSquare);
+        showSidebarNumbers();
+      };
+
+      qSquare.querySelectorAll('input').forEach(input=>{
+        input.onchange = () => {
+          cancelBtn.style.display='inline';
+          q.answered = true;
+          q.selected = input.value;
+          updateNumberSquareStatus(q.id, numSquare);
+          showSidebarNumbers();
+        };
+      });
+
+    } else if (currentPage === 2) {
+      // --- PAGE 2: dropdown ---
+      qSquare.innerHTML = `
+        <h3>${q.q}</h3>
+        <div class="answer-container">
+          <label>Answer:</label>
+          <div class="custom-select">
+            <select name="${q.id}">
+              <option value="" disabled selected hidden></option>
+              ${q._opts.map((o,j)=>`<option value="${String.fromCharCode(65+j)}" ${q.selected===String.fromCharCode(65+j)?'selected':''}>${o}</option>`).join('')}
+              
+            </select>
+          </div>
+        </div>
+      `;
+
+      const select = qSquare.querySelector('select');
+      select.onchange = () => {
+        q.selected = select.value;
+        q.answered = select.value !== '';
+        updateNumberSquareStatus(q.id, numSquare);
+        showSidebarNumbers();
+      };
+    }
+
+    container.appendChild(numSquare);
+    container.appendChild(qSquare);
+    f.appendChild(container);
+  });
+
+  updateBottomButtons();
+  showSidebarNumbers();
+}
+
+// --- Update header ---
+function updatePageHeader() {
+  document.getElementById('pageHeader').textContent = pageHeaders[currentPage] || '';
+}
+
+// --- Show page ---
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// --- Start quiz ---
+function startQuiz() {
+  localStorage.setItem('quizStartTime', new Date().toISOString());
+  buildQuiz();
+  renderQuiz();
+  showPage('quizPage');
+  timeLeft = 7200; // reset to 2 hours
+  startTimer();
+}
+function updateTimer() {
+  const now = new Date();
+  const remaining = quizStartTime.getTime() + timeLimit - now.getTime();
+
+  if (remaining <= 0) {
+    finishQuiz();
+    return;
+  }
+
+  const hrs = Math.floor(remaining / (1000*60*60));
+  const mins = Math.floor((remaining % (1000*60*60)) / (1000*60));
+  const secs = Math.floor((remaining % (1000*60)) / 1000);
+
+  const timeStr = `${hrs}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+  document.getElementById('quizTimer').textContent = timeStr;
+  
+  // also update summary page timer
+  const sTimer = document.getElementById('summaryTimer');
+  if (sTimer) sTimer.textContent = timeStr;
+}
+// --- Timer function ---
+let timeLeft = 7200; // 2 hours in seconds
+let timerInterval;
+
+function startTimer() {
+  clearInterval(timerInterval);
+
+  timerInterval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      finishQuiz();
+      return;
+    }
+
+    timeLeft--;
+
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = timeLeft % 60;
+    const text = `Time left ${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+    // Update quiz page timer
+    const quizTimerEl = document.getElementById("floatingTimer");
+    if (quizTimerEl) quizTimerEl.textContent = text;
+
+    // Update summary page timer
+    const summaryTimerEl = document.getElementById("summaryTimer");
+    if (summaryTimerEl) summaryTimerEl.textContent = text;
+  }, 1000);
+}
+
+
+// --- Update number square status ---
+function updateNumberSquareStatus(id, numSquare){
+  const checked = document.querySelectorAll(`#${id} input:checked`).length;
+  numSquare.querySelector('.answerStatus').textContent = checked ? 'Answer saved' : 'Not yet answered';
+}
+
+// --- Sidebar functions ---
+function openSidebar() {
+  document.getElementById("quizSidebar").style.right = "0";
+  document.getElementById("floatingTimer").style.display = "none";
+  document.getElementById("hideTimerBtn").style.display = "none";
+  showSidebarNumbers();
+}
+function closeSidebar() {
+  document.getElementById("quizSidebar").style.right = "-100%";
+  document.getElementById("floatingTimer").style.display = "block";
+  document.getElementById("hideTimerBtn").style.display = "inline";
+}
+function showSidebarNumbers() {
+  const container = document.getElementById('sidebarNumbers');
+  container.innerHTML = '';
+  quizQuestions.forEach((q, i) => {
+    const btn = document.createElement('div');
+    btn.classList.add('numBtn');
+    if(q.answered) btn.classList.add('answered');
+    if(q.flagged) btn.classList.add('flagged');
+    btn.innerHTML = `<span class="num">${i+1}</span><div class="status"></div>`;
+    btn.onclick = () => { jumpToQuestion(q.id); closeSidebar(); };
+    container.appendChild(btn);
+  });
+}
+
+function jumpToQuestion(id) {
+  // Find the question object
+  const targetQuestion = quizQuestions.find(q => q.id === id);
+  if (!targetQuestion) return;
+
+  const targetPage = targetQuestion.page;
+
+  // If switching page, re-render that page
+  if (currentPage !== targetPage) {
+    currentPage = targetPage;
+    renderQuiz();   // rebuild page content
+  }
+
+  updatePageHeader();
+  updateBottomButtons();
+
+  // Close sidebar
+  closeSidebar();
+
+  // Now scroll to the target question
+  const qDiv = document.getElementById(id);
+  if (qDiv) {
+    qDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+function setVisiblePage(p) {
+  currentPage = p;
+  document.querySelectorAll('.questionContainer').forEach(e => {
+    e.classList.toggle('hiddenPage', parseInt(e.dataset.page) !== p);
+  });
+  updatePageHeader();
+  updateBottomButtons();
+}
+function goNextPage(){ 
+  if(currentPage === 1){ 
+    currentPage = 2; 
+    renderQuiz(); 
+    updatePageHeader(); 
+  } 
+}
+function goPrevPage(){ 
+  if(currentPage === 2){ 
+    currentPage = 1; 
+    renderQuiz(); 
+    updatePageHeader(); 
+  } 
+}
+function updateBottomButtons(){
+  document.getElementById('prevPageBtn').style.display = currentPage === 1 ? 'none' : 'inline-block';
+  document.getElementById('nextPageBtn').style.display = currentPage < 2 ? 'inline-block' : 'none';
+  document.getElementById('finishBtnBottom').style.display = currentPage === 2 ? 'inline-block' : 'none';
+}
+// --- Hide/Show timer ---
+function toggleTimer(page) {
+  let timerEl, btnEl;
+
+  if (page === 'quiz') {
+    timerEl = document.getElementById('floatingTimer');
+    btnEl = document.getElementById('hideTimerBtn');
+  } else if (page === 'summary') {
+    timerEl = document.getElementById('summaryTimer');
+    btnEl = document.getElementById('hideSummaryTimerBtn');
+  }
+
+  if (!timerEl || !btnEl) return;
+
+  if (timerEl.style.display === 'none') {
+    // currently hidden → show again
+    timerEl.style.display = 'inline';
+    btnEl.textContent = 'Hide';
+  } else {
+    // currently shown → hide
+    timerEl.style.display = 'none';
+    btnEl.textContent = 'Show';
+  }
+}
+
+
+
+
+function cancelFinish(){  
+  document.getElementById('modal').style.display = 'none';  
+}
+
+// --- Finish quiz ---
+function finishQuiz() {
+  clearInterval(timerInterval);
+
+  // Start and end time
+  const sISO = localStorage.getItem('quizStartTime');
+  const s = new Date(sISO);
+  document.getElementById('startTime').textContent = s.toLocaleString('en-US', { 
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
+  });
+
+  const e = new Date();
+  document.getElementById('endTime').textContent = e.toLocaleString('en-US', { 
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
+  });
+
+  // Duration
+  const dSeconds = 7200 - timeLeft;
+  const hours = Math.floor(dSeconds / 3600);
+  const minutes = Math.floor((dSeconds % 3600) / 60);
+  const seconds = dSeconds % 60;
+  let durationText = '';
+  if (hours > 0) durationText += hours + ' hours ';
+  if (minutes > 0) durationText += minutes + ' mins';
+  if (hours === 0 && minutes === 0) durationText += seconds + 's';
+  document.getElementById('duration').textContent = durationText;
+
+  // Calculate grade
+  let marks = 0;
+  let totalMarks = 0;
+
+  quizQuestions.forEach((q, i) => {
+    const questionMark = q.page === 1 ? 1 : 2; // Page I = 1, Page II = 2
+    totalMarks += questionMark;
+
+    if (q.selected === q._correctLetter) {
+      marks += questionMark;
+    }
+  });
+
+  document.getElementById('grade').textContent = `${marks} out of ${totalMarks}`;
+  showPage('resultPage');
+}
+// --- Go home ---
+function goHome(){
+  currentPage = 1;
+  timeLeft = 7200;
+  clearInterval(timerInterval);
+
+  // Reset quiz variables
+  quizQuestionsPage1 = quizQuestionsPage1Original.map(q => ({ ...q, answered: false, flagged: false, selected: null }));
+  quizQuestionsPage2 = quizQuestionsPage2Original.map(q => ({ ...q, answered: false, flagged: false, selected: null }));
+  quizQuestions = [...quizQuestionsPage1, ...quizQuestionsPage2];
+
+  renderQuiz();
+  updatePageHeader();
+  showPage('startPage');
+  startTimer();
+}
+
+// --- Restart confirm (optional) ---
+window.addEventListener('beforeunload', function (e) {
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+// --- Init ---
+document.addEventListener('DOMContentLoaded', ()=>{
+  updatePageHeader();
+});
+
+// Keep showReview() as it is
+function showReview(){
+  const reviewContainer = document.getElementById('reviewContainer');
+  reviewContainer.innerHTML = '';
+
+  // Add Page 1 Header
+  const page1Header = document.createElement('h2');
+  page1Header.textContent = "Section I: Answer the following 1-mark questions.";
+  page1Header.style.textAlign = "center";
+  reviewContainer.appendChild(page1Header);
+
+  // Render Page 1 Questions
+  quizQuestionsPage1.forEach((q,i)=>{
+    const n='q1-'+(i+1);
+    const selected=[...document.getElementsByName(n)].find(r=>r.checked)?.value;
+    
+    const questionHtml = `
+      <div class="reviewQuestion">
+        <h3>${i+1}. ${q.q}</h3>
+        ${q._opts.map((opt,j) => {
+          const letter = String.fromCharCode(65+j);
+          const isSelected = selected === letter;
+          const isCorrect = q._correctLetter === letter;
+          const color = isCorrect ? 'green' : (isSelected ? 'red' : 'black');
+          return `
+            <label style="color:${color}">
+              <input type="radio" disabled ${isSelected ? 'checked' : ''}> ${opt} ${isCorrect ? ' (Correct)' : ''}
+            </label><br>
+          `;
+        }).join('')}
+      </div>
+    `;
+    reviewContainer.innerHTML += questionHtml;
+  });
+
+  // Add Page 2 Header
+  const page2Header = document.createElement('h2');
+  page2Header.textContent = "Section II: Answer the following 2-mark questions.";
+  page2Header.style.textAlign = "center";
+  reviewContainer.appendChild(page2Header);
+
+  // Render Page 2 Questions
+  quizQuestionsPage2.forEach((q,i)=>{
+    const n='q2-'+(i+1);
+    const selected=[...document.getElementsByName(n)].find(r=>r.checked)?.value;
+    
+    const questionHtml = `
+      <div class="reviewQuestion">
+        <h3>${quizQuestionsPage1.length+i+1}. ${q.q}</h3>
+        ${q._opts.map((opt,j) => {
+          const letter = String.fromCharCode(65+j);
+          const isSelected = selected === letter;
+          const isCorrect = q._correctLetter === letter;
+          const color = isCorrect ? 'green' : (isSelected ? 'red' : 'black');
+          return `
+            <label style="color:${color}">
+              <input type="radio" disabled ${isSelected ? 'checked' : ''}> ${opt} ${isCorrect ? ' (Correct)' : ''}
+            </label><br>
+          `;
+        }).join('')}
+      </div>
+    `;
+    reviewContainer.innerHTML += questionHtml;
+  });
+
+  showPage('reviewPage');
+}
+
+// assume you already have quizStartTime and timeLimit (in ms or sec)
+// Example: quizStartTime = new Date(); timeLimit = 2*60*60*1000; // 2h
+
+function showSummary() {
+  showPage('summaryPage');
+
+  // build summary table
+  const body = document.getElementById('summaryBody');
+  body.innerHTML = '';
+  let unanswered = 0;
+  quizQuestions.forEach((q, i) => {
+    if (!q.answered) unanswered++;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="question"><button onclick="goToQuestion(${i})">${i+1}</button></td>
+      <td class="status">${q.answered ? 'Answer saved' : 'Not yet answered'}</td>
+    `;
+    body.appendChild(tr);
+  });
+
+  // calculate deadline
+  const startISO = localStorage.getItem('quizStartTime');
+  const start = new Date(startISO);
+  const deadline = new Date(start.getTime() + 2 * 60 * 60 * 1000); // 2h
+
+  document.getElementById('summaryDeadline').textContent =
+    "This attempt must be submitted by " +
+    deadline.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+
+  // attach confirmation open
+  document.getElementById('submitAllBtn').onclick = () =>
+    openConfirmation(unanswered);
+}
+function openConfirmation(unanswered) {
+  document.getElementById('unansweredCount').textContent =
+    `Questions without a response: ${unanswered}`;
+  document.getElementById('confirmationContainer').style.display = 'flex'; // use flex for overlay
+}
+
+function closeConfirmation() {
+  document.getElementById('confirmationContainer').style.display = 'none';
+}
+
+function confirmSubmit() {
+  closeConfirmation();
+  finishQuiz(); // go result page
+}
+function goToQuestion(index) {
+  const q = quizQuestions[index];
+  if (!q) return;
+
+  // switch to correct page
+  if (currentPage !== q.page) {
+    currentPage = q.page;
+    renderQuiz();
+  }
+
+  updatePageHeader();
+  updateBottomButtons();
+  showPage('quizPage');
+
+  // scroll to the question
+  const target = document.getElementById(q.id);
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+</script>
+</body>
+</html>
